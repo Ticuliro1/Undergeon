@@ -149,6 +149,12 @@ body{overflow:hidden;min-height:0;height:100vh}
 .shop{padding:clamp(64px,6.5vw,90px) 16px clamp(80px,8vw,110px)}
 .shophead{top:clamp(44px,5vw,64px)}
 .modal-overlay{padding:clamp(64px,6.5vw,90px) 18px clamp(80px,8vw,110px)}
+</style><style id="ui5">
+.shop{padding:16px 22px 22px}
+.shophead{top:0;margin:-16px -22px 12px;padding:14px 22px;background:rgba(8,12,18,.98);border-bottom:1px solid var(--ln);box-shadow:0 8px 20px rgba(0,0,0,.45)}
+.modal-overlay{padding:24px}
+#hud{transition:opacity .25s,visibility .25s}
+.stage.ui-open #hud{opacity:0;visibility:hidden}
 </style></head>
 <body>
 <div class="wrap">
@@ -1870,5 +1876,5 @@ if(sp&&spt)sp.classList.toggle('rdy',spt.textContent.trim()==='ESP');
 requestAnimationFrame(f);})();
 })();
 </script>
-</body>
+<script>(()=>{const st=document.querySelector('.stage');(function f(){st.classList.toggle('ui-open',!!document.querySelector('.stage .shop.on,.stage .modal-overlay.on'));requestAnimationFrame(f);})();})();</script></body>
 </html>
