@@ -155,7 +155,7 @@ body{overflow:hidden;min-height:0;height:100vh}
 .modal-overlay{padding:24px}
 #hud{transition:opacity .25s,visibility .25s}
 .stage.ui-open #hud{opacity:0;visibility:hidden}
-</style></head>
+</style><style id="ui6">#hud.noinv .invp{display:none}#invBtn{font-size:.9em}#hud.noinv #invBtn{opacity:.6}</style></head>
 <body>
 <div class="wrap">
   
@@ -167,7 +167,7 @@ body{overflow:hidden;min-height:0;height:100vh}
         <div class="pill">Giro <div class="mini"><i id="chb"></i></div> <div id="sp"><span id="spt">🔒</span></div></div></div>
       <div id="hudC"><div class="pill">Onda <b id="wave">1</b> · <b id="rem">0</b> restantes</div></div>
       <div id="hudR"><div class="pill coin">● <b id="coins">0</b></div><div class="pill">Combo <b id="cmb">—</b></div><div class="pill sm">Recorde <b id="best">0</b></div></div>
-      <div id="hudBL"><div class="pill invp"><div id="invg"></div></div><div class="pill sm">Habilidades <b id="skh">—</b></div></div>
+      <div id="hudBL"><div class="pill invp"><div id="invg"></div></div><div class="pill sm">Habilidades <b id="skh">—</b></div><button id="invBtn" title="Mostrar/ocultar inventário" aria-pressed="true">🎒 Inventário</button></div>
       <div id="hudBR"><button id="shopBtn" title="Loja / Upgrades [TAB]">🛒 Loja [TAB]</button><button id="pauseBtn" title="Pausar [P]">Ⅱ [P]</button><button id="settingsBtn" title="Configurações">⚙</button><button id="mute" title="Som [M]">🔊 [M]</button></div>
       <div id="hidstats" style="display:none"><b id="mx">—</b><b id="top">0</b><b id="dmg">—</b><input id="vol" type="range" min="0" max="100" value="50"></div>
     </div>
@@ -1876,5 +1876,7 @@ if(sp&&spt)sp.classList.toggle('rdy',spt.textContent.trim()==='ESP');
 requestAnimationFrame(f);})();
 })();
 </script>
-<script>(()=>{const st=document.querySelector('.stage');(function f(){st.classList.toggle('ui-open',!!document.querySelector('.stage .shop.on,.stage .modal-overlay.on'));requestAnimationFrame(f);})();})();</script></body>
+<script>(()=>{const st=document.querySelector('.stage');(function f(){st.classList.toggle('ui-open',!!document.querySelector('.stage .shop.on,.stage .modal-overlay.on'));requestAnimationFrame(f);})();})();</script><script>(()=>{const h=document.getElementById('hud'),b=document.getElementById('invBtn');let on=true;try{on=localStorage.getItem('ug_inv')!=='0';}catch(e){}
+const ap=()=>{h.classList.toggle('noinv',!on);b.setAttribute('aria-pressed',on);b.textContent=(on?'🎒 Inventário: ON':'🎒 Inventário: OFF');};
+b.addEventListener('click',()=>{on=!on;try{localStorage.setItem('ug_inv',on?'1':'0');}catch(e){}ap();b.blur();});ap();})();</script></body>
 </html>
