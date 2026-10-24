@@ -1357,7 +1357,7 @@ function drawPillars() {
   }
 }
 function buildForge() {
-  let h = `<div class="inv">${Object.keys(MAT).map(m => `<span style="color:${MAT[m].c}">◆ ${MAT[m].n}: <b>${inv[m]||0}</b></span>`).join('')}</div>`;
+  let h = '';
   h += '<p class="hint">Em cada receita: <span class="ing ok">✔ você tem</span> · <span class="ing no">✖ falta (quantidade que falta entre parênteses)</span></p>';
   if (!forgeOK) h += '<p class="warn">Para forjar ou melhorar, vá até a runa central entre as ondas e aperte E.</p>';
   h += '<div class="grid">';
