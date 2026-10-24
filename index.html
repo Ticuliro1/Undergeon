@@ -145,6 +145,10 @@ body{overflow:hidden;min-height:0;height:100vh}
 #hud button{padding:6px 12px;border-radius:999px;background:rgba(10,15,22,.72);backdrop-filter:blur(4px)}
 .mini.w{width:min(22vw,200px);height:16px}
 .mini.w b{position:absolute;inset:0;z-index:2;display:grid;place-items:center;font-size:11px;text-shadow:0 1px 2px #000}
+</style><style id="ui4">
+.shop{padding:clamp(64px,6.5vw,90px) 16px clamp(80px,8vw,110px)}
+.shophead{top:clamp(44px,5vw,64px)}
+.modal-overlay{padding:clamp(64px,6.5vw,90px) 18px clamp(80px,8vw,110px)}
 </style></head>
 <body>
 <div class="wrap">
@@ -564,9 +568,10 @@ function atmos() {
   ctx.restore();
 }
 // ----- Árvore radial (interface) -----
+const TV = {x:0, y:0, z:1};
 function drawTree() {
   const cn = $('skc'); if (!cn) return; const g = cn.getContext('2d'), t = performance.now()/1000, CX = 500, CY = 380;
-  g.clearRect(0,0,1000,760); const bg = g.createRadialGradient(CX,CY,30,CX,CY,560); bg.addColorStop(0,'#1b212d'); bg.addColorStop(1,'#06080c'); g.fillStyle = bg; g.fillRect(0,0,1000,760);
+  g.clearRect(0,0,1000,760); const bg = g.createRadialGradient(CX,CY,30,CX,CY,560); bg.addColorStop(0,'#1b212d'); bg.addColorStop(1,'#06080c'); g.fillStyle = bg; g.fillRect(0,0,1000,760); g.save(); g.translate(TV.x,TV.y); g.scale(TV.z,TV.z);
   for (const k in BR) { const B = BR[k], a = B.a*Math.PI/180, gg = g.createRadialGradient(CX,CY,30,CX,CY,400); gg.addColorStop(0,B.c+'30'); gg.addColorStop(1,B.c+'00'); g.fillStyle = gg; g.beginPath(); g.moveTo(CX,CY); g.arc(CX,CY,400,a-.52,a+.52); g.closePath(); g.fill(); }
   g.strokeStyle = 'rgba(255,255,255,.06)'; g.lineWidth = 1; for (const r of [132,184,236,288,340,372]) { g.beginPath(); g.arc(CX,CY,r,0,7); g.stroke(); }
   g.lineCap = 'round';
@@ -583,7 +588,7 @@ function drawTree() {
   g.save(); g.translate(CX,CY); g.shadowColor = '#ffcf5a'; g.shadowBlur = 26+6*Math.sin(t*2); g.fillStyle = '#0d1118'; g.beginPath(); g.arc(0,0,40,0,7); g.fill(); g.lineWidth = 4; g.strokeStyle = '#ffcf5a'; g.stroke(); g.shadowBlur = 0; g.lineWidth = 1.5; g.strokeStyle = '#ffcf5a66'; g.beginPath(); g.arc(0,0,50,0,7); g.stroke(); g.font = '34px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('🔨',0,2); g.restore();
   g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = 'bold 12px system-ui'; g.lineJoin = 'round';
   for (const k in BR) { const B = BR[k], a = B.a*Math.PI/180, x = CX+Math.cos(a)*92, y = CY+Math.sin(a)*92; g.lineWidth = 4; g.strokeStyle = '#05070a'; g.strokeText(B.n.toUpperCase(),x,y); g.fillStyle = B.c; g.fillText(B.n.toUpperCase(),x,y); }
-  g.textAlign = 'left'; g.font = 'bold 14px system-ui'; g.fillStyle = '#ffd166'; g.fillText('Nós: '+NODES.filter(n => sk[n.id]).length+'/'+NODES.length, 16, 24); g.fillStyle = '#e8edf4'; g.fillText('● '+player.coins, 16, 46);
+  g.restore(); g.textAlign = 'left'; g.font = 'bold 14px system-ui'; g.fillStyle = '#ffd166'; g.fillText('Nós: '+NODES.filter(n => sk[n.id]).length+'/'+NODES.length, 16, 24); g.fillStyle = '#e8edf4'; g.fillText('● '+player.coins, 16, 46);
   let i = 0; for (const k in BR) { g.fillStyle = BR[k].c; g.shadowColor = BR[k].c; g.shadowBlur = 8; g.beginPath(); g.arc(24+i*26,736,6,0,7); g.fill(); i++; } g.shadowBlur = 0;
 }
 function showSkTip(n, e) {
@@ -594,11 +599,21 @@ function showSkTip(n, e) {
 }
 function buildSkills() {
   const c = $('skills');
-  c.innerHTML = `<div class="inv"><span class="coin">● Moedas: <b>${player.coins}</b></span>${Object.keys(MAT).map(m => `<span style="color:${MAT[m].c}">◆ ${MAT[m].n}: <b>${inv[m]||0}</b></span>`).join('')}</div><p class="hint">Árvore radial: parta do martelo central e siga cada ramo. Nós brilhantes podem ser desbloqueados; passe o mouse para ver custos e efeitos. Teclas: Q investida · F escudo · C elemento.</p><canvas id="skc" width="1000" height="760" style="width:100%;aspect-ratio:1000/760;background:#06080c;cursor:default"></canvas>`;
+  c.innerHTML = `<div class="inv"><span class="coin">● Moedas: <b>${player.coins}</b></span>${Object.keys(MAT).map(m => `<span style="color:${MAT[m].c}">◆ ${MAT[m].n}: <b>${inv[m]||0}</b></span>`).join('')}</div><p class="hint">Árvore radial: parta do martelo central e siga cada ramo. Nós brilhantes podem ser desbloqueados. Roda do mouse: zoom · arrastar: mover · duplo clique: recentrar.</p><canvas id="skc" width="1000" height="760" style="display:block;margin:0 auto;height:auto;aspect-ratio:1000/760;width:min(100%,max(300px,calc((min(100vh,56.25vw) - 300px)*1.316)));background:#06080c;cursor:grab"></canvas>`;
   const cn = $('skc');
-  cn.onmousemove = e => { const r = cn.getBoundingClientRect(), x = (e.clientX-r.left)*1000/r.width, y = (e.clientY-r.top)*760/r.height; hv = NODES.find(n => Math.hypot(n.x-x,n.y-y) < (n.k ? 27 : 22)) || null; cn.style.cursor = hv ? 'pointer' : 'default'; showSkTip(hv, e); };
-  cn.onmouseleave = () => { hv = null; tipDiv.style.display = 'none'; };
-  cn.onclick = () => { if (hv) buySkill(hv.id); };
+  const pos = e => { const r = cn.getBoundingClientRect(); return [(e.clientX-r.left)*1000/r.width, (e.clientY-r.top)*760/r.height]; };
+  let drag = null, moved = 0;
+  cn.onmousedown = e => { drag = {x:e.clientX, y:e.clientY, tx:TV.x, ty:TV.y}; moved = 0; };
+  cn.onmousemove = e => { const r = cn.getBoundingClientRect(), k = 1000/r.width;
+    if (drag) { const dx = (e.clientX-drag.x)*k, dy = (e.clientY-drag.y)*k; moved = Math.max(moved, Math.hypot(dx,dy));
+      if (moved > 4) { TV.x = drag.tx+dx; TV.y = drag.ty+dy; hv = null; tipDiv.style.display = 'none'; cn.style.cursor = 'grabbing'; return; } }
+    const [x,y] = pos(e), wx = (x-TV.x)/TV.z, wy = (y-TV.y)/TV.z;
+    hv = NODES.find(n => Math.hypot(n.x-wx,n.y-wy) < (n.k ? 27 : 22)) || null; cn.style.cursor = hv ? 'pointer' : 'grab'; showSkTip(hv, e); };
+  cn.onmouseup = () => { drag = null; };
+  cn.onmouseleave = () => { drag = null; hv = null; tipDiv.style.display = 'none'; };
+  cn.onclick = () => { if (hv && moved <= 4) buySkill(hv.id); };
+  cn.ondblclick = () => { TV.x = 0; TV.y = 0; TV.z = 1; };
+  cn.onwheel = e => { e.preventDefault(); const [x,y] = pos(e), nz = clamp(TV.z*(e.deltaY < 0 ? 1.15 : 1/1.15), .6, 3.2), f = nz/TV.z; TV.x = x-(x-TV.x)*f; TV.y = y-(y-TV.y)*f; TV.z = nz; };
   tipDiv.style.display = 'none';
 }
 function buySkill(id) {
