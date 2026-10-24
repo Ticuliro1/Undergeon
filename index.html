@@ -122,27 +122,45 @@ button:focus-visible{outline:2px solid #ffd166;outline-offset:2px}
 .ach-toast.on{animation:toastIn .55s ease-out}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
-</head>
+<style id="ui3">
+body{overflow:hidden;min-height:0;height:100vh}
+.wrap{width:100vw;height:100vh;padding:0;display:flex;align-items:center;justify-content:center}
+.stage{width:min(100vw,calc(100vh*16/9));aspect-ratio:16/9;margin:0 auto;flex:none}
+#game{width:100%;height:100%;aspect-ratio:auto;border:0;border-radius:0;box-shadow:none}
+.shop,.modal-overlay,#vig{border-radius:0}
+.shop{font-size:clamp(14px,1.05vw,18px)}
+#boss{top:52px}
+#hud{position:absolute;inset:0;pointer-events:none;z-index:3;font-size:clamp(11px,.85vw,15px)}
+#hud>div{position:absolute;display:flex;gap:6px;animation:fadeIn .8s both}
+#hudL{top:10px;left:10px;flex-direction:column;align-items:flex-start}
+#hudC{top:10px;left:50%;transform:translateX(-50%)}
+#hudR{top:10px;right:10px;align-items:flex-start}
+#hudBL{bottom:10px;left:10px;flex-direction:column;align-items:flex-start}
+#hudBR{bottom:10px;right:10px;pointer-events:auto}
+#hud .pill{background:rgba(10,15,22,.62);backdrop-filter:blur(4px);padding:5px 12px;border-radius:999px;pointer-events:none;gap:6px}
+#hud .pill:hover{transform:none;box-shadow:none}
+#hud .pill.sm{font-size:.85em;color:var(--mut)}
+#hud .invp{border-radius:12px;pointer-events:auto}
+#hud #invg{grid-template-columns:repeat(auto-fill,32px);width:min(44vw,360px)}
+#hud button{padding:6px 12px;border-radius:999px;background:rgba(10,15,22,.72);backdrop-filter:blur(4px)}
+.mini.w{width:min(22vw,200px);height:16px}
+.mini.w b{position:absolute;inset:0;z-index:2;display:grid;place-items:center;font-size:11px;text-shadow:0 1px 2px #000}
+</style></head>
 <body>
 <div class="wrap">
-  <header>
-    <h1>🔨 Undergeon</h1>
-    
-  </header>
-  <div class="layout">
-  <aside class="side" id="sideL">
-    <div class="pill">❤ <b id="hpt">100/100</b><div class="mini"><i id="hpb"></i></div></div>
-    <div class="pill coin">● Moedas: <b id="coins">0</b></div>
-    <div class="pill">Onda: <b id="wave">1</b></div>
-    <div class="pill">Restantes: <b id="rem">0</b></div>
-    <div class="pill">Giro <div class="mini"><i id="chb"></i></div></div>
-    <div class="pill">Especial <div id="sp"><span id="spt">🔒</span></div></div>
-    <div class="pill">Habilidades: <b id="skh">—</b></div>
-    <div class="pill invp"><span>Inventário</span><div id="invg"></div></div>
-  </aside>
+  
   <div class="stage">
-    <canvas id="game" width="1000" height="780" aria-label="Jogo de marreta física"></canvas>
+    <canvas id="game" width="1600" height="900" aria-label="Jogo de marreta física"></canvas>
     <div id="vig"></div>
+    <div id="hud">
+      <div id="hudL"><div class="pill">❤ <div class="mini w"><i id="hpb"></i><b id="hpt">100/100</b></div></div>
+        <div class="pill">Giro <div class="mini"><i id="chb"></i></div> <div id="sp"><span id="spt">🔒</span></div></div></div>
+      <div id="hudC"><div class="pill">Onda <b id="wave">1</b> · <b id="rem">0</b> restantes</div></div>
+      <div id="hudR"><div class="pill coin">● <b id="coins">0</b></div><div class="pill">Combo <b id="cmb">—</b></div><div class="pill sm">Recorde <b id="best">0</b></div></div>
+      <div id="hudBL"><div class="pill invp"><div id="invg"></div></div><div class="pill sm">Habilidades <b id="skh">—</b></div></div>
+      <div id="hudBR"><button id="shopBtn" title="Loja / Upgrades [TAB]">🛒 Loja [TAB]</button><button id="pauseBtn" title="Pausar [P]">Ⅱ [P]</button><button id="settingsBtn" title="Configurações">⚙</button><button id="mute" title="Som [M]">🔊 [M]</button></div>
+      <div id="hidstats" style="display:none"><b id="mx">—</b><b id="top">0</b><b id="dmg">—</b><input id="vol" type="range" min="0" max="100" value="50"></div>
+    </div>
     <div id="menu" class="shop on"><div class="shophead"><h2>Escolha sua arma</h2></div><div id="wgrid" class="grid"></div></div>
     <div id="boss"><b id="bossn">CHEFE</b><div class="bar"><i id="bossb"></i><span id="bosshp">15.000 / 15.000 HP</span></div></div>
     <div id="shop" class="shop">
@@ -161,15 +179,6 @@ button:focus-visible{outline:2px solid #ffd166;outline-offset:2px}
     </div></div>
     <div id="controlsOverlay" class="modal-overlay"><div class="modal-panel"><h2>Controles</h2><p class="modal-sub">Clique em um atalho e pressione a nova tecla. Movimento e ações podem ser personalizados. Mouse: mover para mirar; segurar botão esquerdo para carregar e soltar para golpear; botão direito para onda de choque (também pode usar o atalho configurado).</p><div id="controlsList"></div><div style="display:flex;justify-content:space-between;gap:8px;margin-top:16px"><button id="controlsReset">Restaurar padrão</button><button id="controlsClose">Voltar</button></div></div></div>
     <div id="achToast" class="ach-toast"><b id="achTitle">CONQUISTA DESBLOQUEADA</b><div id="achDesc" class="hint"></div></div>
-  </div>
-  <aside class="side" id="sideR">
-    <div class="pill">Recorde: <b id="best">0</b></div>
-    <div class="pill" title="Dano teórico: giro máximo, carga cheia e combo máximo">Dano máx.: <b id="mx">—</b> · maior golpe: <b id="top">0</b></div>
-    <div class="pill">🔊 <input id="vol" type="range" min="0" max="100" value="50" style="width:80px"> <button id="mute" style="padding:4px 8px">Som: on [M]</button></div>
-    <div class="pill">Combo: <b id="cmb">—</b></div>
-    <div class="pill">Último golpe: <b id="dmg">—</b></div>
-    <button id="shopBtn">Loja / Upgrades [TAB]</button><button id="pauseBtn">Ⅱ Pausar [P]</button><button id="settingsBtn">⚙ Configurações</button>
-  </aside>
   </div>
   <div id="tip"></div>
 <div id="ctxm"></div>
@@ -1043,7 +1052,7 @@ function draw() {
   }
   atmos();
   if (state === 'rest' && !over && wave > 0 && !rewardOpen && !pauseOpen && !settingsOpen) {
-    ctx.font = '600 16px system-ui'; ctx.fillStyle = '#93a3b6'; ctx.fillText('Próxima onda em '+Math.ceil(restT)+'s · abra a loja com TAB', W/2, 34);
+    ctx.font = '600 16px system-ui'; ctx.fillStyle = '#93a3b6'; ctx.fillText('Próxima onda em '+Math.ceil(restT)+'s · abra a loja com TAB', W/2, H-30);
   }
   if (buff.mag > 0 || buff.rage > 0) { ctx.font = '700 15px system-ui'; ctx.fillStyle = '#ffd166'; ctx.textAlign = 'left'; ctx.fillText((buff.rage > 0 ? '⚡ Fúria '+Math.ceil(buff.rage)+'s   ' : '')+(buff.mag > 0 ? '🧲 Ímã '+Math.ceil(buff.mag)+'s' : ''), 28, 50); ctx.textAlign = 'center'; }
   if (over) {
@@ -1194,7 +1203,7 @@ function makeFloor(i) {
   const v = g.createRadialGradient(W/2,H/2,H*.35,W/2,H/2,W*.62); v.addColorStop(0,'rgba(0,0,0,0)'); v.addColorStop(1,'rgba(0,0,0,.6)'); g.fillStyle = v; g.fillRect(0,0,W,H);
   return c;
 }
-const TORCH = [[130,16],[500,16],[870,16],[130,H-16],[500,H-16],[870,H-16]];
+const TORCH = [[W*.13,16],[W/2,16],[W*.87,16],[W*.13,H-16],[W/2,H-16],[W*.87,H-16]];
 function drawFloor() {
   const b = biomeOf(wave); if (b !== floorId || !floorC) { floorC = makeFloor(b); floorId = b; }
   ctx.drawImage(floorC, 0, 0);
@@ -1303,7 +1312,7 @@ function drawDrop(c, now) {
   const y = c.y+Math.sin(now*.005+c.ph)*2; ctx.fillStyle = MAT[c.m].c; ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 1.5;
   ctx.beginPath(); ctx.moveTo(c.x,y-8); ctx.lineTo(c.x+6,y); ctx.lineTo(c.x,y+8); ctx.lineTo(c.x-6,y); ctx.closePath(); ctx.fill(); ctx.stroke();
 }
-function makePillars() { return [[250,H/2-190],[750,H/2-190],[250,H/2+190],[750,H/2+190]].map(([x,y]) => ({x, y, r:26, hp:260, max:260, cd:0, dead:false})); }
+function makePillars() { return [[W/2-400,H/2-220],[W/2+400,H/2-220],[W/2-400,H/2+220],[W/2+400,H/2+220]].map(([x,y]) => ({x, y, r:26, hp:260, max:260, cd:0, dead:false})); }
 function pushOut(o, r) {
   for (const q of pillars) { if (q.dead) continue; const dx = o.x-q.x, dy = o.y-q.y, d = Math.hypot(dx,dy), m = q.r+r;
     if (d < m && d > 0) { o.x = q.x+dx/d*m; o.y = q.y+dy/d*m; if (o.vx !== undefined) { const vn = o.vx*dx/d+o.vy*dy/d; if (vn < 0) { o.vx -= vn*dx/d*1.3; o.vy -= vn*dy/d*1.3; } } } }
@@ -1651,7 +1660,7 @@ function audioInit() {
   if (AC && AC.state === 'suspended') AC.resume();
 }
 function setVol(v) { vol = v; if (master) master.gain.value = muted ? 0 : vol; try { localStorage.setItem('mf_vol', v); } catch (e) {} }
-function toggleMute() { muted = !muted; if (master) master.gain.value = muted ? 0 : vol; $('mute').textContent = muted ? 'Som: off [M]' : 'Som: on [M]'; }
+function toggleMute() { muted = !muted; if (master) master.gain.value = muted ? 0 : vol; $('mute').textContent = muted ? '🔇 [M]' : '🔊 [M]'; }
 function tone(f, d, type = 'sine', v = .2, f2 = null, delay = 0) {
   if (!AC) return; const t = AC.currentTime+delay, o = AC.createOscillator(), g = AC.createGain();
   o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t+d);
